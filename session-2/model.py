@@ -3,21 +3,24 @@ import torch.nn as nn
 
 class MyLeNet(nn.Module):
 
-    def __init__(self):
+    def __init__(self, conv1_out=6, conv2_out=16, kernel=5, pooling=2, fc_hidden1=120, fc_hidden2=84):
         super().__init__()
         # Input: 1, 64x64px
         # Output: 6, 30x30 (kernel 5, pooling 2)
-        self.conv1 = ConvBlock(1, 6, 5)  # 7 -> 58 -> 29
+        self.conv1 = ConvBlock(1, conv1_out, kernel, pooling)  # 7 -> 58 -> 29
+        conv1_out_size = (64 - kernel + 1) / pooling
         # Input: 6, 30x30
         # Output: 16, 13x13
-        self.conv2 = ConvBlock(6, 16, 5)  # 6 -> 24 -> 12
+        self.conv2 = ConvBlock(conv1_out, conv2_out, kernel, pooling)  # 6 -> 24 -> 12
+        conv2_out_size = (conv1_out_size - kernel + 1) / pooling
         # Input: 16 * 13 * 13  # 13*12*12
+        self.feature_size = int(conv2_out * conv2_out_size * conv2_out_size)
         self.mlp = nn.Sequential(
-            nn.Linear(2704, 120),
+            nn.Linear(self.feature_size, fc_hidden1),
             nn.ReLU(),
-            nn.Linear(120, 84),
+            nn.Linear(fc_hidden1, fc_hidden2),
             nn.ReLU(),
-            nn.Linear(84, 15),
+            nn.Linear(fc_hidden2, 15),
             nn.LogSoftmax()
         )
 
@@ -26,7 +29,7 @@ class MyLeNet(nn.Module):
         x = self.conv2(x)
 
         bsz, nch, height, width = x.shape
-        x = x.view(bsz, 2704)
+        x = x.view(bsz, self.feature_size)
         y = self.mlp(x)
         return y
 
