@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from torch.utils.data import Dataset
 from PIL import Image
+import torch
 
 
 class MyDataset(Dataset):
@@ -20,6 +21,6 @@ class MyDataset(Dataset):
         image_path = os.path.join(self.images_path, f"input_{suite_id}_{sample_id}_{code}.jpg")
         image = Image.open(image_path)
         if self.transform:
-            self.transform(image)
+            image = self.transform(image)
 
         return image, code - 1  # Try to run the whole model without this. It shouldn't change, right?

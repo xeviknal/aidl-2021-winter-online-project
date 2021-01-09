@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class MyLeNet(nn.Module):
 
-    def __init__(self, conv1_out=6, conv2_out=16, kernel=5, pooling=2, fc_hidden1=120, fc_hidden2=84):
+    def __init__(self, conv1_out=6, conv2_out=16, kernel=5, pooling=2, fc_hidden1=120, fc_hidden2=84, num_classes=15):
         super().__init__()
         # Input: 1, 64x64px
         # Output: 6, 30x30 (kernel 5, pooling 2)
@@ -20,8 +20,8 @@ class MyLeNet(nn.Module):
             nn.ReLU(),
             nn.Linear(fc_hidden1, fc_hidden2),
             nn.ReLU(),
-            nn.Linear(fc_hidden2, 15),
-            nn.LogSoftmax()
+            nn.Linear(fc_hidden2, num_classes),
+            nn.LogSoftmax(dim=-1)
         )
 
     def forward(self, x):
