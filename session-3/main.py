@@ -25,6 +25,7 @@ def train_single_epoch(model, train_loader, optimizer, criterion):
         loss.backward()
         optimizer.step()
 
+        losses.append(loss.item())
         acc = binary_accuracy(y, output)
         accs.append(acc.item())
     return np.mean(losses), np.mean(accs)
